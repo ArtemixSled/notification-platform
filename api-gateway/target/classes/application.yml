@@ -1,0 +1,43 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: false
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            name: notificationCb
+            routeId: notification-service
+            fallbackUri: forward:/fallback/notification
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: false
+    fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - gateway      # вот это очень важно — gateway должен быть в списке
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true     # без этого actuator/gateway никогда не появится
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
