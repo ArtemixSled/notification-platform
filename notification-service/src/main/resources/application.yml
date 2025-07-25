@@ -1,0 +1,36 @@
+server:
+  port: 8081
+
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: notification-service
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    hostname: localhost
+    ipAddress: 127.0.0.1
+    prefer-ip-address: true
+    nonSecurePort: ${server.port}
+    statusPageUrlPath: /actuator/health
+    healthCheckUrlPath: /actuator/health
+
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - env
+  endpoint:
+    health:
+      show-details: always

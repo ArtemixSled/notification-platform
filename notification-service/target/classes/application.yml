@@ -1,0 +1,42 @@
+# src/main/resources/application.yml
+server:
+  port: 8081
+
+spring:
+  config:
+    # подтягиваем остальной конфиг из Config Server (файл notification-service.yml)
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: notification-service
+
+eureka:
+  instance:
+    # уникальный instance-id (можно любое, важно не повторяться)
+    instance-id: ${spring.application.name}:${random.value}
+    # принудительно задаём хост и IP
+    hostname: localhost
+    ipAddress: 127.0.0.1
+    prefer-ip-address: true
+    # указываем, на каком порту работает наше приложение
+    nonSecurePort: ${server.port}
+    # пути для Health/Status (чтобы Eureka могла сама проверять)
+    statusPageUrlPath: /actuator/health
+    healthCheckUrlPath: /actuator/health
+
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - env
+  endpoint:
+    health:
+      show-details: always
