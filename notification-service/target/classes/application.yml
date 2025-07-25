@@ -1,25 +1,45 @@
-# src/main/resources/application.yml
 server:
   port: 8081
 
 spring:
   config:
-    # подтягиваем остальной конфиг из Config Server (файл notification-service.yml)
     import: optional:configserver:http://localhost:8888
   application:
     name: notification-service
 
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.trusted.packages: "org.example.dto"
+        spring.json.value.default.type: "org.example.dto.NotificationMessageDto"
+        spring.json.use.type.headers: false
+
+  mail:
+    host: mailhog
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
 eureka:
   instance:
-    # уникальный instance-id (можно любое, важно не повторяться)
     instance-id: ${spring.application.name}:${random.value}
-    # принудительно задаём хост и IP
     hostname: localhost
     ipAddress: 127.0.0.1
     prefer-ip-address: true
-    # указываем, на каком порту работает наше приложение
     nonSecurePort: ${server.port}
-    # пути для Health/Status (чтобы Eureka могла сама проверять)
     statusPageUrlPath: /actuator/health
     healthCheckUrlPath: /actuator/health
 
