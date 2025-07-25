@@ -21,7 +21,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: false
+    register-with-eureka: true
     fetch-registry: true
 
 management:
@@ -32,6 +32,8 @@ management:
           - health
           - info
           - gateway
+          - env
+          - routes
   endpoint:
     health:
       show-details: always
